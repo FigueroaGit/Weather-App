@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import com.figueroa.weatherapp.data.DataOrException
 import com.figueroa.weatherapp.model.Forecastday
 import com.figueroa.weatherapp.model.WeatherForecast
+import com.figueroa.weatherapp.navigation.WeatherScreens
 import com.figueroa.weatherapp.utils.formatDate
 import com.figueroa.weatherapp.utils.formatDecimals
 import com.figueroa.weatherapp.widgets.HumidityWindPressureRow
@@ -42,11 +43,15 @@ import com.figueroa.weatherapp.widgets.WeatherDetailRow
 import com.figueroa.weatherapp.widgets.WeatherStateImage
 
 @Composable
-fun MainScreen(navController: NavController, mainViewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(
+    navController: NavController,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    city: String?,
+) {
     val weatherData = produceState<DataOrException<WeatherForecast, Boolean, Exception>>(
         initialValue = DataOrException(loading = true),
     ) {
-        value = mainViewModel.getWeatherData(city = "Mexico")
+        value = mainViewModel.getWeatherData(city = city.toString())
     }.value
 
     if (weatherData.loading == true) {
@@ -63,6 +68,9 @@ fun MainScaffold(weatherForecast: WeatherForecast, navController: NavController)
         WeatherAppBar(
             title = weatherForecast.location.name + ", ${weatherForecast.location.country}",
             navController = navController,
+            onAddActionClicked = {
+                navController.navigate(WeatherScreens.SearchScreen.name)
+            },
         )
     }) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
