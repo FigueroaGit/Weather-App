@@ -4,15 +4,18 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -22,28 +25,28 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.figueroa.weatherapp.R
 import com.figueroa.weatherapp.data.DataOrException
+import com.figueroa.weatherapp.model.Forecastday
 import com.figueroa.weatherapp.model.WeatherForecast
 import com.figueroa.weatherapp.utils.formatDate
 import com.figueroa.weatherapp.utils.formatDecimals
+import com.figueroa.weatherapp.widgets.HumidityWindPressureRow
+import com.figueroa.weatherapp.widgets.SunsetSunRiseRow
 import com.figueroa.weatherapp.widgets.WeatherAppBar
+import com.figueroa.weatherapp.widgets.WeatherDetailRow
+import com.figueroa.weatherapp.widgets.WeatherStateImage
 
 @Composable
 fun MainScreen(navController: NavController, mainViewModel: MainViewModel = hiltViewModel()) {
     val weatherData = produceState<DataOrException<WeatherForecast, Boolean, Exception>>(
         initialValue = DataOrException(loading = true),
     ) {
-        value = mainViewModel.getWeatherData(city = "Istanbul")
+        value = mainViewModel.getWeatherData(city = "Mexico")
     }.value
 
     if (weatherData.loading == true) {
@@ -78,7 +81,7 @@ fun MainContent(data: WeatherForecast) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = formatDate(data.current.last_updated_epoch),
+            text = formatDate(data.forecast.forecastday[0].date_epoch),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.SemiBold,
@@ -104,57 +107,22 @@ fun MainContent(data: WeatherForecast) {
         }
         HumidityWindPressureRow(weather = data)
         Divider()
-    }
-}
-
-@Composable
-fun HumidityWindPressureRow(weather: WeatherForecast) {
-    Row(
-        modifier = Modifier.padding(12.dp).fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Row(modifier = Modifier.padding(4.dp)) {
-            Icon(
-                painter = painterResource(id = R.drawable.humidity),
-                contentDescription = "Humidity Icon",
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = "${weather.current.humidity}%",
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
-        Row() {
-            Icon(
-                painter = painterResource(id = R.drawable.pressure),
-                contentDescription = "Pressure Icon",
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = "${weather.current.pressure_mb} psi",
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
-        Row() {
-            Icon(
-                painter = painterResource(id = R.drawable.wind),
-                contentDescription = "Wind Icon",
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = "${weather.current.wind_mph} mph",
-                style = MaterialTheme.typography.labelLarge,
-            )
+        SunsetSunRiseRow(weather = data)
+        Text(
+            text = "This week",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Surface(
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            color = Color(0xFFEEF1EF),
+            shape = RoundedCornerShape(size = 12.dp),
+        ) {
+            LazyColumn(modifier = Modifier.padding(2.dp), contentPadding = PaddingValues(1.dp)) {
+                items(items = data.forecast.forecastday) { item: Forecastday ->
+                    WeatherDetailRow(weatherForecast = item)
+                }
+            }
         }
     }
-}
-
-@Composable
-fun WeatherStateImage(imageUrl: String) {
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(imageUrl).build(),
-        contentDescription = "Icon Image",
-        modifier = Modifier.size(64.dp),
-    )
 }
