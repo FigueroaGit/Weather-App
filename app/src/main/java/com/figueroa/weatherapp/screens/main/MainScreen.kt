@@ -21,7 +21,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +39,7 @@ import com.figueroa.weatherapp.data.DataOrException
 import com.figueroa.weatherapp.model.Forecastday
 import com.figueroa.weatherapp.model.WeatherForecast
 import com.figueroa.weatherapp.navigation.WeatherScreens
+import com.figueroa.weatherapp.screens.settings.SettingsViewModel
 import com.figueroa.weatherapp.utils.formatDate
 import com.figueroa.weatherapp.utils.formatDecimals
 import com.figueroa.weatherapp.widgets.HumidityWindPressureRow
@@ -46,6 +52,7 @@ import com.figueroa.weatherapp.widgets.WeatherStateImage
 fun MainScreen(
     navController: NavController,
     mainViewModel: MainViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     city: String?,
 ) {
     val weatherData = produceState<DataOrException<WeatherForecast, Boolean, Exception>>(
@@ -84,7 +91,9 @@ fun MainContent(data: WeatherForecast) {
     val imageUrl = "http:${data.forecast.forecastday[0].day.condition.icon}"
     Log.d("Img", data.forecast.forecastday[0].day.condition.icon)
     Column(
-        modifier = Modifier.padding(4.dp).fillMaxWidth(),
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -96,7 +105,9 @@ fun MainContent(data: WeatherForecast) {
             modifier = Modifier.padding(6.dp),
         )
         Surface(
-            modifier = Modifier.padding(4.dp).size(200.dp),
+            modifier = Modifier
+                .padding(4.dp)
+                .size(200.dp),
             shape = CircleShape,
             color = Color(0xFFFFC400),
         ) {
@@ -122,7 +133,9 @@ fun MainContent(data: WeatherForecast) {
             fontWeight = FontWeight.Bold,
         )
         Surface(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
             color = Color(0xFFEEF1EF),
             shape = RoundedCornerShape(size = 12.dp),
         ) {

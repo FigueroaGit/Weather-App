@@ -7,9 +7,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.figueroa.weatherapp.screens.about.AboutScreen
+import com.figueroa.weatherapp.screens.favorites.FavoritesScreen
 import com.figueroa.weatherapp.screens.main.MainScreen
 import com.figueroa.weatherapp.screens.main.MainViewModel
 import com.figueroa.weatherapp.screens.search.SearchScreen
+import com.figueroa.weatherapp.screens.settings.SettingsScreen
 import com.figueroa.weatherapp.screens.splash.WeatherSplashScreen
 
 @Composable
@@ -38,6 +41,18 @@ fun WeatherNavigation() {
 
         composable(route = WeatherScreens.SearchScreen.name) {
             SearchScreen(navController = navController)
+        }
+
+        composable(route = WeatherScreens.AboutScreen.name) {
+            AboutScreen(navController = navController)
+        }
+
+        composable(route = WeatherScreens.SettingsScreen.name) {
+            SettingsScreen(navController = navController)
+        }
+
+        composable(route = WeatherScreens.FavoriteScreen.name) {
+            FavoritesScreen(navController = navController)
         }
     }
 }
